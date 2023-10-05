@@ -1,4 +1,4 @@
-package com.example.assignment1;
+package com.example.mobileappdevassignment1;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +10,7 @@ import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText num1; // initial principle
+    private EditText num1; // initial principal
     private EditText num2; // annual interest rate
     private EditText num3; // total number of payments in months
     private Button add; // calculation button
@@ -21,8 +21,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_first);
 
-        // Finds the numbers inputted into the textboxes by using the id in first fragment
-        num1 = (EditText) findViewById(R.id.Principle);
+        // Finds the numbers inputted into the text boxes by using the id in first fragment
+        num1 = (EditText) findViewById(R.id.Principal);
         num2 = (EditText) findViewById(R.id.Interest);
         num3 = (EditText) findViewById(R.id.TotalPayment);
         num4 = (TextView) findViewById(R.id.PaymentAmount);
@@ -31,23 +31,34 @@ public class MainActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Converts the numbers from the text boxes to strings
-                double initialPrincipal = Double.parseDouble(num1.getText().toString());
-                double annualInterestRate = Double.parseDouble(num2.getText().toString());
-                double totalPayments = Double.parseDouble(num3.getText().toString());
+                try {
+                    // Converts the numbers from the text boxes to strings
+                    double initialPrincipal = Double.parseDouble(num1.getText().toString());
+                    double annualInterestRate = Double.parseDouble(num2.getText().toString());
+                    double totalPayments = Double.parseDouble(num3.getText().toString());
 
-                double monthlyInterestRate = annualInterestRate / 12 / 100; // Convert annual interest rate to a decimal and monthly rate
+                    // Check if any of the input values is negative
+                    if (initialPrincipal < 0 || annualInterestRate < 0 || totalPayments < 0) {
+                        num4.setText("Invalid input. Please enter positive numbers.");
+                        // Exits
+                        return;
+                    }
 
-                // Math equation for Loan/Mortgage Monthly Payment (Amortization formula)
-                // A = P[r(1+r)^n] / [(1+r)^n - 1]
-                double numerator = monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments);
-                double denominator = Math.pow(1 + monthlyInterestRate, totalPayments) - 1;
-                double finalCalc = initialPrincipal * (numerator / denominator);
+                    // Converts the annual interest rate to a decimal and then to a monthly rate
+                    double monthlyInterestRate = annualInterestRate / 12 / 100;
 
-                // Format the result to two decimal places
-                DecimalFormat decimalFormat = new DecimalFormat("#.##");
-                String formattedResult = decimalFormat.format(finalCalc);
-                num4.setText("The total amount to be paid monthly is $" + formattedResult);
+                    // Calculate the monthly payment using the correct amortization formula
+                    double finalCalc = (initialPrincipal * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments)) /
+                            (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
+
+                    // Format the result to two decimal places
+                    DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                    String formattedResult = decimalFormat.format(finalCalc);
+                    num4.setText("The total amount to be paid monthly is $" + formattedResult);
+                } catch (NumberFormatException e) {
+                    // Handles anything not numbers
+                    num4.setText("Invalid input. Please enter valid numbers.");
+                }
             }
         });
     }
